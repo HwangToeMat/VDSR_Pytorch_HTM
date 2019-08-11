@@ -1,0 +1,7 @@
+Epoch : 50
+Optimizer : SGD
+batchsize : 128
+momentum : 0.9
+Initial lr = 0.1
+step = 10 (*0.1)
+clip = 0.4
