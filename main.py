@@ -55,6 +55,14 @@ def main():
     model = Net() # net
     criterion = nn.MSELoss(size_average=False) # set loss
 
+    # optionally copy weights from a checkpoint
+    if opt.pretrained:
+        if os.path.isfile(opt.pretrained):
+            print("=> loading model '{}'".format(opt.pretrained))
+            model = torch.load(opt.pretrained)['model']# load model
+        else:
+            print("=> no model found at '{}'".format(opt.pretrained))
+
     print("===> Setting GPU")
     if cuda:
         model = model.cuda()
@@ -64,15 +72,6 @@ def main():
     if opt.start_epoch:
         if os.path.isfile(opt.start_epoch): # if user input start_epoch
             print("=> start epoch '{}'".format(opt.start_epoch))
-
-    # optionally copy weights from a checkpoint
-    if opt.pretrained:
-        if os.path.isfile(opt.pretrained):
-            print("=> loading model '{}'".format(opt.pretrained))
-            weights = torch.load(opt.pretrained)# load model
-            model.load_state_dict(weights['model'].state_dict())
-        else:
-            print("=> no model found at '{}'".format(opt.pretrained))
 
     print("===> Setting Optimizer")
     if opt.optimizer == 'SGD':
