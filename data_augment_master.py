@@ -55,6 +55,10 @@ def img_rotate(img, degree):
         dst = cv2.warpAffine(img, matrix, (width, height))
     return dst
 
+def img_downsize(img, ds):
+    dst = cv2.resize(img, dsize=(0, 0), fx=ds, fy=ds, interpolation=cv2.INTER_LINEAR)
+    return dst
+
 def zoom_img(img, scale):
     label = cv2.normalize(img.astype('float'), None, 0.0, 1.0, cv2.NORM_MINMAX)
     temp_input = cv2.resize(label, dsize=(0, 0), fx=1/scale, fy=1/scale, interpolation=cv2.INTER_AREA)
@@ -74,14 +78,21 @@ def data_aug(file_path = 'data/Train', savepath = 'data/train.h5', i_size = 41, 
     img_path = load_img(file_path)
     for _ in img_path:
         image = read_img(_)
-        for degree in [0.,1.,2.,3.]:
-            image_r = img_rotate(image, degree)
-            for scale in [2,3,4]:
-                md_image = mod_crop(image_r, scale)
-                input, label = zoom_img(md_image, scale)
-                sub_ipt, sub_lab = sub_img(input, label, i_size, l_size, stride)
-                sub_ip += sub_ipt
-                sub_la += sub_lab
+        for flip in [0,1]:
+            if flip == 0:
+                image_f = image
+            else:
+                image_f = cv2.flip(image,1)
+            for degree in [0.,1.,2.,3.]:
+                image_r = img_rotate(image_f, degree)
+                for ds in [1., 0.7, 0.4]:
+                    image_d = img_downsize(image_r, ds)
+                    for scale in [2,3,4]:
+                        md_image = mod_crop(image_d, scale)
+                        input, label = zoom_img(md_image, scale)
+                        sub_ipt, sub_lab = sub_img(input, label, i_size, l_size, stride)
+                        sub_ip += sub_ipt
+                        sub_la += sub_lab
         print('data no.',num)
         num += 1
     sub_ip = np.asarray(sub_ip)
