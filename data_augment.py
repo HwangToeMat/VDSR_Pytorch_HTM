@@ -46,6 +46,16 @@ def read_img(img_path):
     image = image[:, :, 0]
     return image
 
+def img_downsize(img, ds):
+    dst = cv2.resize(img, dsize=(0, 0), fx=ds, fy=ds, interpolation=cv2.INTER_LINEAR)
+    return dst
+
+def zoom_img(img, scale):
+    label = img.astype('float') / 255
+    temp_input = cv2.resize(label, dsize=(0, 0), fx=1/scale, fy=1/scale, interpolation=cv2.INTER_AREA)
+    input = cv2.resize(temp_input, dsize=(0, 0), fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
+    return input, label
+
 def img_rotate(img, degree):
     height, width = img.shape
     matrix = cv2.getRotationMatrix2D((width/2, height/2), 90*degree, 1)
@@ -54,12 +64,6 @@ def img_rotate(img, degree):
     else:
         dst = cv2.warpAffine(img, matrix, (width, height))
     return dst
-
-def zoom_img(img, scale):
-    label = cv2.normalize(img.astype('float'), None, 0.0, 1.0, cv2.NORM_MINMAX)
-    temp_input = cv2.resize(label, dsize=(0, 0), fx=1/scale, fy=1/scale, interpolation=cv2.INTER_AREA)
-    input = cv2.resize(temp_input, dsize=(0, 0), fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
-    return input, label
 
 def save_h5(sub_ip, sub_la, savepath = 'data/train.h5'):
     path = os.path.join(os.getcwd(), savepath)
@@ -74,14 +78,16 @@ def data_aug(file_path = 'data/Train', savepath = 'data/train.h5', i_size = 41, 
     img_path = load_img(file_path)
     for _ in img_path:
         image = read_img(_)
-        for degree in [0.,1.,2.,3.]:
+        for degree in [0.,1.]:
             image_r = img_rotate(image, degree)
-            for scale in [2,3,4]:
-                md_image = mod_crop(image_r, scale)
-                input, label = zoom_img(md_image, scale)
-                sub_ipt, sub_lab = sub_img(input, label, i_size, l_size, stride)
-                sub_ip += sub_ipt
-                sub_la += sub_lab
+            for ds in [1., 0.8]:
+                image_d = img_downsize(image_r, ds)
+                for scale in [2,3,4]:
+                    md_image = mod_crop(image_d, scale)
+                    input, label = zoom_img(md_image, scale)
+                    sub_ipt, sub_lab = sub_img(input, label, i_size, l_size, stride)
+                    sub_ip += sub_ipt
+                    sub_la += sub_lab
         print('data no.',num)
         num += 1
     sub_ip = np.asarray(sub_ip)
