@@ -129,7 +129,7 @@ def train(training_data_loader, optimizer, model, criterion, epoch):
     psnr = PSNR(epoch_loss)
     print("===> Epoch[{}]: loss : {:.10f} ,PSNR : {:.10f}".format(epoch, epoch_loss, psnr))
 
-def save_checkpoint(model, epoch):
+def save_checkpoint(model, epoch, optimizer):
     model_out_path = "checkpoint/" + "VDSR_{}_epoch_{}.pth".format(opt.optimizer, epoch)
     if not os.path.exists("checkpoint/"):
         os.makedirs("checkpoint/")
