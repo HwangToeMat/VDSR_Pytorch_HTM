@@ -63,7 +63,7 @@ def main():
             print("=> loading model '{}'".format(opt.pretrained))
             checkpoint = torch.load(opt.pretrained)
             model.load_state_dict(checkpoint['model_state_dict'])
-            epoch = checkpoint['epoch']# load model
+            epoch = checkpoint['epoch'] + 1# load model
         else:
             print("=> no model found at '{}'".format(opt.pretrained))
 
