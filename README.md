@@ -1,4 +1,4 @@
-# VDSR_Pytorch_HTM
+# VDSR_Pytorch_HTM ![HitCount](http://hits.dwyl.com/HwangToeMat/VDSR_Pytorch_HTM.svg)
 
 ## Accurate Image Super-Resolution Using Very Deep Convolutional Networks
 
